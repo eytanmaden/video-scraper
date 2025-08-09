@@ -10,7 +10,14 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     d.innerHTML = s;
     return d.textContent || d.innerText || "";
   };
-  const uniq = (arr) => [...new Set(arr.filter(Boolean))];
+  const uniq = (arr) => [
+    ...new Set(
+      arr
+        .filter(Boolean)
+        .map((x) => x.trim())
+        .filter(Boolean)
+    )
+  ];
   const pick = (obj, ...keys) => Object.fromEntries(keys.map((k) => [k, obj?.[k] ?? null]));
   const parseDuration = (s = "") => {
     if (!s) return { raw: "", seconds: null };
@@ -26,7 +33,7 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     return { raw: s, seconds: h * 3600 + m * 60 + sec };
   };
 
-  // 1) Wrapper <div> with CNN data-*
+  // 1) Wrapper
   const wrapper = document.querySelector('.video-resource,[data-component-name="video-player"]');
   const d = wrapper?.dataset || {};
   let poster = null;
@@ -34,7 +41,7 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     poster = JSON.parse(decode(d.posterImageOverride || "{}"))?.big?.uri || null;
   } catch {}
 
-  // 2) JSON-LD VideoObject (if present)
+  // 2) JSON-LD
   const jsonLdVideo = (() => {
     const nodes = [...document.querySelectorAll('script[type="application/ld+json"]')];
     for (const n of nodes) {
@@ -53,7 +60,7 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     return null;
   })();
 
-  // 3) <meta> tags (OG/Twitter/article)
+  // 3) Meta
   const meta = [...document.querySelectorAll("meta")].reduce((acc, m) => {
     const k = m.getAttribute("property") || m.getAttribute("name");
     const v = m.getAttribute("content");
@@ -61,11 +68,11 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     return acc;
   }, {});
 
-  // 4) Active <video> for natural resolution (if loaded)
+  // 4) Video resolution
   const videoEl = document.querySelector("video.top-player-video-element, video");
   const resolution = videoEl?.videoWidth && videoEl?.videoHeight ? `${videoEl.videoWidth}x${videoEl.videoHeight}` : null;
 
-  // 5) Any m3u8s seen this session (DevTools "Preserve log" helps)
+  // 5) m3u8s
   const m3u8s = uniq(
     performance
       .getEntriesByType("resource")
@@ -73,15 +80,27 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
       .filter((u) => /\.m3u8(\?|$)/i.test(u))
   );
 
-  // Merge, preferring wrapper → JSON-LD → meta fallbacks
+  // --- duration
   const duration = parseDuration(d.duration || jsonLdVideo?.duration || "");
+
+  // --- tags/section (THIS is the fix)
+  const tagsFromAttr = (d.videoTags || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   const tagsFromLd = jsonLdVideo?.keywords
     ? Array.isArray(jsonLdVideo.keywords)
       ? jsonLdVideo.keywords
-      : String(jsonLdVideo.keywords)
-          .split(",")
-          .map((s) => s.trim())
+      : String(jsonLdVideo.keywords).split(",")
     : [];
+
+  // include section as a fallback “category tag”
+  const sectionTag = d.videoSection ? [String(d.videoSection)] : [];
+
+  const mergedTags = uniq([...tagsFromAttr, ...tagsFromLd, ...sectionTag]);
+
+  // --- author heuristic
   const author =
     jsonLdVideo?.author?.name ||
     jsonLdVideo?.publisher?.name ||
@@ -94,13 +113,7 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     title: d.headline || jsonLdVideo?.name || meta["og:title"] || document.title || null,
     publicationDateUTC: d.publishDate || jsonLdVideo?.uploadDate || meta["article:published_time"] || null,
     section: d.videoSection || null,
-    tags:
-      (d.videoTags
-        ? d.videoTags
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : null) || tagsFromLd,
+    tags: mergedTags, // <-- now includes `world` (or other section) if tags empty
     duration: duration.raw || null,
     durationSeconds: duration.seconds,
     description: strip(decode(d.description || jsonLdVideo?.description || meta["og:description"] || "")) || null,
@@ -117,6 +130,7 @@ const scrapeCnnVideoMetadata = (downloadJson) => {
     title: out.title,
     publicationDateUTC: out.publicationDateUTC,
     section: out.section,
+    tags: out.tags?.join("|") || "",
     duration: out.duration,
     durationSeconds: out.durationSeconds,
     resolution: out.resolution
