@@ -1,4 +1,4 @@
-const scrapeCnnVideoMetadata = (downloadJOSN) => {
+const scrapeCnnVideoMetadata = (downloadJson) => {
   // --- helpers ---
   const decode = (s = "") => {
     const t = document.createElement("textarea");
@@ -123,7 +123,7 @@ const scrapeCnnVideoMetadata = (downloadJOSN) => {
   });
   console.log("Full metadata:", out);
 
-  if (downloadJOSN) {
+  if (downloadJson) {
     const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
