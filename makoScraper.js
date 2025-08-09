@@ -1,4 +1,4 @@
-const makoScraper = (downloadJSON) => {
+const scrapeMakoVideoMetadata = (downloadJSON) => {
   const strip = (s = "") => {
     const d = document.createElement("div");
     d.innerHTML = s;
