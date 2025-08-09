@@ -1,0 +1,28 @@
+{
+  "source": "edition.cnn.com",
+  "title": "Surgeon shows humanitarian crisis in Gaza's hospitals",
+  "publicationDateUTC": "2025-07-17T01:31:30.220Z",
+  "section": "world",
+  "tags": [
+    "world"
+  ],
+  "duration": "04:29",
+  "durationSeconds": 269,
+  "description": "A surgeon working in southern Gaza says babies are arriving at hospital so malnourished that “skin and bones doesn’t do it justice.” He also describes what appears to be a disturbing pattern in the gunshot wounds of children arriving from food distribution sites. CNN’s Nada Bashir reports.",
+  "videoId": "me84048ad8924eebba85f9d82d7a7b13a6752c53df",
+  "canonicalUrl": "https://www.cnn.com/2025/07/16/world/video/maynard-gaza-hospitals-nada-bashir-digvid",
+  "posterImage": "https://media.cnn.com/api/v1/images/stellar/prod/video-maynard-gaza-digvid.jpg?c=original",
+  "contentType": "uploaded-clip",
+  "resolution": "640x360",
+  "hlsPlaylists": [
+    "https://clips-media-fly.warnermediacdn.com/cnn/clips/2025-07/1973261-5b2b43a5dc1c4fa5985d81cf9f3dbcd2/cmaf/master_cl_de.m3u8?playername=top-2.18.0",
+    "https://clips-media-fly.warnermediacdn.com/cnn/clips/2025-07/1973261-5b2b43a5dc1c4fa5985d81cf9f3dbcd2/cmaf/h264_1920x1080_8000k/h264_1920x1080_8000k.m3u8",
+    "https://clips-media-fly.warnermediacdn.com/cnn/clips/2025-07/1973261-5b2b43a5dc1c4fa5985d81cf9f3dbcd2/cmaf/mp4a-40-2/mp4a-40-2-128000.m3u8",
+    "https://clips-media-fly.warnermediacdn.com/cnn/clips/2025-07/1973261-5b2b43a5dc1c4fa5985d81cf9f3dbcd2/cmaf/h264_640x360_1000k/h264_640x360_1000k.m3u8"
+  ],
+  "extra": {
+    "videoResourceUri": null,
+    "videoResourceParentUri": null,
+    "boltId": "d9332a51-ecb0-5fc2-8778-a3fdef2a1814"
+  }
+}
